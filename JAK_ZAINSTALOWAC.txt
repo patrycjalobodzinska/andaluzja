@@ -1,0 +1,10 @@
+Andaluzja 2026 – instalacja jako aplikacja (PWA)
+
+1. Wejdź na https://app.netlify.com/drop (darmowe, bez konfiguracji).
+2. Przeciągnij CAŁY ten folder (po rozpakowaniu) na stronę.
+3. Dostaniesz link https://....netlify.app – otwórz go na telefonie.
+4. iPhone (Safari): Udostępnij -> Do ekranu początkowego.
+   Android (Chrome): menu ⋮ -> Zainstaluj aplikację / Dodaj do ekranu głównego.
+
+Aplikacja zapamiętuje się w telefonie: kolejne uruchomienia są natychmiastowe,
+a odhaczone miejsca i bilety zostają zapisane na urządzeniu.

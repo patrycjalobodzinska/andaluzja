@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="pl" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Andaluzja 2026</title>
+<meta name="theme-color" content="#1D4E9E">
+<meta name="color-scheme" content="light only">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Andaluzja">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,400;0,500;0,700;0,800;1,400;1,500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cal:#FAFAF7; --surface:#FFFFFF; --ink:#1A2238; --ink-soft:#4A5370;
+  --cobalt:#1D4E9E; --cobalt-soft:#E6EDF8; --albero:#C98A1C; --albero-soft:#FBF1DD;
+  --geranio:#B8323A; --geranio-soft:#FBE8E8; --line:#D9DEEA; --done:#5E8B5A;
+  --serif:"Figtree", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --sans:"Figtree", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color-scheme: light only;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px);-webkit-text-size-adjust:100%;overflow-y:scroll;scrollbar-gutter:stable}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--cal);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;-webkit-tap-highlight-color:transparent;overscroll-behavior-y:none}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--cal)}
+button{font:inherit;color:inherit}
+a{color:var(--cobalt)}
+:focus-visible{outline:3px solid var(--albero);outline-offset:2px;border-radius:6px}
+
+/* ---------- Tile band (the one bold element) ---------- */
+:root{
+  --t: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='56' viewBox='0 0 56 56'%3E%3Crect width='56' height='56' fill='%231D4E9E'/%3E%3Cpath d='M28 4 L40 16 L28 28 L16 16Z M28 28 L40 40 L28 52 L16 40Z M4 28 L16 16 L28 28 L16 40Z M52 28 L40 16 L28 28 L40 40Z' fill='%23F4F7FC'/%3E%3Ccircle cx='28' cy='28' r='5' fill='%23C98A1C'/%3E%3Cpath d='M0 0h10L0 10Z M56 0v10L46 0Z M0 56v-10l10 10Z M56 56h-10l10-10Z' fill='%23C98A1C'/%3E%3Ccircle cx='28' cy='16' r='2.2' fill='%231D4E9E'/%3E%3Ccircle cx='28' cy='40' r='2.2' fill='%231D4E9E'/%3E%3Ccircle cx='16' cy='28' r='2.2' fill='%231D4E9E'/%3E%3Ccircle cx='40' cy='28' r='2.2' fill='%231D4E9E'/%3E%3C/svg%3E");
+}
+.tiles{background-image:var(--t);background-size:56px 56px}
+html::before{content:"";position:fixed;inset:0;z-index:-1;background-image:var(--t);background-size:64px 64px;opacity:.09;pointer-events:none}
+.day-head h2{background:var(--cal);display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;padding:0 6px;margin-left:-6px;border-radius:6px}
+header.top{position:relative;height:48px}
+.cartouche{
+  position:relative;background:var(--surface);color:var(--ink);
+  border:3px solid #1D4E9E;outline:2px solid #1D4E9E;outline-offset:3px;
+  border-radius:18px 18px 18px 18px / 26px 26px 26px 26px;
+  padding:14px 16px 12px;max-width:560px;margin:0 auto;text-align:center;
+  box-shadow:0 0 0 7px var(--surface);
+}
+.cartouche .city{font-family:var(--serif);font-weight:800;font-size:clamp(34px,10vw,46px);line-height:1;letter-spacing:.01em;margin:0}
+.cartouche .route{font-family:var(--serif);font-style:italic;font-size:17px;color:var(--ink-soft);margin:6px 0 0}
+.cartouche .status{margin:10px 0 0;font-size:15px;color:var(--cobalt);font-weight:700}
+
+/* ---------- Day strip ---------- */
+nav.days{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--cal);border-bottom:1px solid var(--line)}
+.days-scroll{display:flex;gap:6px;overflow-x:auto;padding:10px 14px;scrollbar-width:none;scroll-snap-type:x proximity}
+.days-scroll::-webkit-scrollbar{display:none}
+.day-chip{flex:0 0 auto;scroll-snap-align:center;border:1.5px solid var(--line);background:var(--surface);border-radius:14px;padding:6px 12px 7px;min-width:64px;text-align:center;cursor:pointer;line-height:1.15}
+.day-chip .wd{font-size:13px;color:var(--ink-soft)}
+.day-chip .dn{font-family:var(--serif);font-weight:700;font-size:22px}
+.day-chip .ct{font-size:12px;color:var(--ink-soft);white-space:nowrap}
+.day-chip[aria-selected="true"]{background:var(--cobalt);border-color:var(--cobalt);color:#fff}
+.day-chip[aria-selected="true"] .wd,.day-chip[aria-selected="true"] .ct{color:rgba(255,255,255,.85)}
+.day-chip.today{border-color:var(--albero)}
+.day-chip.tickets-chip{background:var(--albero-soft);border-color:var(--albero)}
+.day-chip.tickets-chip[aria-selected="true"]{background:var(--albero);border-color:var(--albero);color:#1A2238}
+
+/* ---------- Day view ---------- */
+main{max-width:640px;margin:0 auto;padding:16px 16px 40px;min-height:100vh}
+.day-head{margin:6px 0 18px}
+.day-head h2{font-family:var(--serif);font-weight:700;font-size:26px;line-height:1.15;margin:0}
+.day-head p{margin:4px 0 0;color:var(--ink-soft)}
+.intro-card{display:flex;gap:14px;align-items:stretch;width:100%;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:0;margin:0 0 22px;cursor:pointer;overflow:hidden}
+.intro-card .intro-tile{flex:0 0 44px;background-size:44px 44px}
+.intro-card > span:last-child{padding:12px 14px 12px 0;display:block}
+.intro-card b{display:block;font-size:17px;margin-bottom:2px}
+.intro-card b + span{display:block;color:var(--ink-soft);font-size:15px;line-height:1.4}
+.food-card{margin-top:-12px}
+.food-ico{flex:0 0 44px;display:grid;place-items:center;font-size:22px;background:var(--albero-soft)}
+ul.food{gap:12px}
+ul.food li{padding:12px 14px;background:var(--surface);border:1px solid var(--line);border-radius:12px}
+ul.food li::before{display:none}
+.fm{font-size:13px;font-weight:700;color:var(--albero);text-transform:uppercase;letter-spacing:.04em}
+.fn{font-weight:800;font-size:18px;line-height:1.25;margin:2px 0 4px}
+.fd{color:var(--ink-soft);line-height:1.5}
+.fl{display:inline-block;margin-top:8px;font-weight:700;text-decoration:none}
+.fnote{color:var(--ink-soft);font-size:14px;margin-top:14px}
+.sleep{display:flex;align-items:center;gap:10px;margin-top:22px;padding:12px 14px;border-radius:12px;background:var(--cobalt-soft);color:var(--ink);font-weight:500}
+.sleep svg{flex:0 0 auto}
+
+.timeline{list-style:none;margin:0;padding:0;position:relative}
+.timeline::before{content:"";position:absolute;left:6px;top:8px;bottom:8px;border-left:2px dotted var(--cobalt);opacity:.45}
+.stop{display:grid;grid-template-columns:14px 1fr;gap:12px;padding:0 0 14px;position:relative}
+.stop .when{visibility:hidden;overflow:hidden;min-width:0;font-size:13px;line-height:1.2;padding-right:6px;color:var(--ink-soft);text-align:right;padding-top:15px;font-weight:500}
+.stop .when b{display:block;color:var(--ink);font-size:15px}
+.stop::after{content:"";position:absolute;left:1px;top:17px;width:12px;height:12px;border-radius:50%;background:var(--cal);border:2.5px solid var(--cobalt)}
+.stop.is-done::after{background:var(--done);border-color:var(--done)}
+.stop.is-skip::after{border-color:var(--line)}
+.card{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 44px 12px 14px;cursor:pointer;text-align:left;width:100%;display:block}
+.card .t{font-size:13.5px;font-weight:700;color:var(--cobalt);line-height:1.3;margin-bottom:2px}
+.card h3{font-family:var(--serif);font-size:20px;font-weight:700;line-height:1.2;margin:0}
+.card p{margin:4px 0 0;color:var(--ink-soft);font-size:15.5px;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.stop.is-done .card h3{text-decoration:line-through;text-decoration-color:var(--done);text-decoration-thickness:2px}
+.stop.is-skip .card{background:transparent;border-style:dashed}
+.stop.is-skip .card h3{color:var(--ink-soft)}
+.badges{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.badge{font-size:13px;font-weight:700;padding:2px 9px;border-radius:999px;line-height:1.5}
+.badge.ticket{background:var(--albero-soft);color:var(--albero)}
+.badge.warn{background:var(--geranio-soft);color:var(--geranio)}
+.badge.skip{background:var(--cobalt-soft);color:var(--ink-soft)}
+.badge.flight{background:var(--cobalt-soft);color:var(--cobalt)}
+.check{position:absolute;right:8px;top:10px;width:30px;height:30px;border-radius:50%;border:2px solid var(--line);background:var(--surface);display:grid;place-items:center;cursor:pointer;padding:0}
+.check svg{opacity:0}
+.stop.is-done .check{background:var(--done);border-color:var(--done)}
+.stop.is-done .check svg{opacity:1}
+
+/* ---------- Tickets view ---------- */
+.tlist{list-style:none;padding:0;margin:0;display:grid;gap:8px}
+.titem{display:flex;gap:12px;align-items:flex-start;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.titem input{width:22px;height:22px;margin:2px 0 0;accent-color:var(--done);flex:0 0 auto}
+.titem label{flex:1;cursor:pointer}
+.titem .tt{font-weight:700}
+.titem .td{color:var(--ink-soft);font-size:15px}
+.titem.checked .tt{text-decoration:line-through;color:var(--ink-soft)}
+.group-h{font-family:var(--serif);font-weight:700;font-size:20px;margin:22px 0 10px}
+.group-h:first-child{margin-top:0}
+.reset{margin-top:28px;background:none;border:1px solid var(--line);border-radius:10px;padding:8px 14px;color:var(--ink-soft);cursor:pointer}
+
+/* ---------- Sheet ---------- */
+.scrim{position:fixed;inset:0;background:rgba(10,14,30,.45);opacity:0;pointer-events:none;transition:opacity .2s;z-index:40;touch-action:none}
+.scrim.open{opacity:1;pointer-events:auto}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:50;max-height:92%;background:var(--cal);border-radius:20px 20px 0 0;transform:translateY(100%);transition:transform .28s cubic-bezier(.2,.8,.2,1);display:flex;flex-direction:column;max-width:720px;margin:0 auto;box-shadow:0 -10px 40px rgba(0,0,0,.18)}
+.sheet.open{transform:none}
+.sheet-band{height:14px;border-radius:20px 20px 0 0;flex:0 0 auto}
+.sheet-top{display:flex;align-items:flex-start;gap:12px;padding:14px 16px 10px;flex:0 0 auto}
+.sheet-top h2{font-family:var(--serif);font-weight:800;font-size:27px;line-height:1.1;margin:0;flex:1}
+.sheet-top .sub{font-family:var(--serif);font-style:italic;color:var(--ink-soft);margin:4px 0 0;font-size:16px}
+.close{flex:0 0 auto;width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center;cursor:pointer}
+.sheet-body{overflow-y:auto;-webkit-overflow-scrolling:touch;padding:4px 18px calc(24px + env(safe-area-inset-bottom,0px));overscroll-behavior:contain}
+.sheet-body section{margin:0 0 20px}
+.sheet-body h4{font-family:var(--serif);font-size:19px;font-weight:700;margin:0 0 6px;color:var(--cobalt)}
+.sheet-body p{margin:0 0 10px;line-height:1.6;max-width:68ch}
+.sheet-body ul{margin:0;padding:0;list-style:none;display:grid;gap:10px}
+.sheet-body li{position:relative;padding-left:22px;line-height:1.55}
+.sheet-body li::before{content:"";position:absolute;left:3px;top:.55em;width:9px;height:9px;transform:rotate(45deg);background:var(--albero)}
+.note{border-radius:12px;padding:12px 14px;margin:0 0 18px;line-height:1.5}
+.note.warn{background:var(--geranio-soft);color:var(--ink);border-left:4px solid var(--geranio)}
+.note.plan{background:var(--surface);border:1px solid var(--line)}
+.note.plan b{display:block;font-size:14px;color:var(--ink-soft);font-weight:700;margin-bottom:2px}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 20px}
+.btn{display:inline-flex;align-items:center;gap:8px;text-decoration:none;font-weight:700;border-radius:12px;padding:10px 14px;border:1.5px solid var(--cobalt);color:var(--cobalt);background:var(--surface);cursor:pointer}
+.btn.primary{background:var(--cobalt);color:#fff}
+.btn.done-on{border-color:var(--done);color:var(--done)}
+
+.footer{margin-top:36px;text-align:center;font-size:14px;color:var(--ink-soft)}
+.footer button{background:none;border:none;color:var(--cobalt);text-decoration:underline;cursor:pointer;padding:4px}
+.fade-in{animation:fi .22s ease-out}
+@keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion: reduce){.sheet,.scrim{transition:none}.fade-in{animation:none}}
+</style>
+</head>
+<body>
+<header class="top tiles" aria-hidden="true"></header>
+<nav class="days" aria-label="Dni podróży"><div class="days-scroll" id="days" role="tablist"></div></nav>
+<main id="main"></main>
+<div class="scrim" id="scrim"></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle" aria-hidden="true">
+  <div class="sheet-band tiles"></div>
+  <div class="sheet-top">
+    <div style="flex:1"><h2 id="sheetTitle"></h2><p class="sub" id="sheetSub"></p></div>
+    <button class="close" id="sheetClose" aria-label="Zamknij"><svg width="16" height="16" viewBox="0 0 16 16"><path d="M2 2l12 12M14 2L2 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+  </div>
+  <div class="sheet-body" id="sheetBody"></div>
+</div>
+
+<script>
+/* =================== DANE =================== */
+const DAYS = [
+{ id:"d25", date:"2026-10-25", wd:"Nd", dn:"25", short:"Sewilla", title:"Przylot i pierwszy wieczór w Sewilli", route:"Warszawa → Sewilla", sleep:"Sewilla",
+  intro:{"name": "Sewilla", "sub": "krótka historia miasta", "history": ["Rzymianie nazywali miasto Hispalis. Kilka kilometrów dalej leżała Italica, w której urodzili się cesarze Trajan i Hadrian. W czasach Wizygotów działał tu św. Izydor z Sewilli, autor Etymologii – encyklopedii, z której Europa uczyła się przez całe średniowiecze.", "W 712 r. miasto zdobyli muzułmanie i nazwali je Iszbilija. W XI wieku było stolicą niezależnego emiratu, którym rządził król-poeta al-Mutamid, a w XII wieku Almohadzi uczynili je stolicą swojej części al-Andalus i zbudowali wielki meczet z Giraldą. W 1248 r. Sewillę zdobył Ferdynand III Kastylijski.", "Złoty wiek przyszedł po odkryciu Ameryki. Od 1503 r. Sewilla miała monopol na handel z Nowym Światem – każdy statek i każda uncja srebra musiały przejść przez tutejszą Casa de Contratación. Stąd w 1519 r. wypłynęła wyprawa Magellana. W XVI wieku było to jedno z największych i najbogatszych miast Europy.", "Upadek był równie gwałtowny. Epidemia dżumy w 1649 r. zabiła mniej więcej połowę mieszkańców, a zamulający się Gwadalkiwir utrudniał żeglugę dużym statkom. W 1717 r. monopol przeniesiono do Kadyksu. Sewilla odbiła się dopiero w XX wieku dzięki dwóm wystawom: z 1929 i Expo 1992."], "facts": ["Herb Sewilli to skrót NO8DO – supeł (madeja) między literami czyta się jako no me ha dejado, czyli nie opuściła mnie. Według tradycji to podziękowanie króla Alfonsa X za wierność miasta w czasie buntu jego syna. Znajdziecie go na studzienkach, latarniach i autobusach."]},
+  food:[{"m": "Kolacja / tapas", "n": "Las Teresas", "d": "Klasyczny bar w sercu Santa Cruz, działa od 1870 r. Szynki pod sufitem, tapas przy barze. Spróbujcie ensaladilla rusa.", "q": "Las Teresas, Calle Santa Teresa 2, Sevilla"}, {"m": "Kolacja / tapas", "n": "Bodega Santa Cruz (Las Columnas)", "d": "Głośno, tłoczno i lokalnie – je się na stojąco na ulicy. Krewetki w cieście, pringá, kalmary. Tanio.", "q": "Bodega Santa Cruz Las Columnas, Calle Rodrigo Caro 1, Sevilla"}, {"m": "Kolacja / tapas", "n": "Bar Casa Vizcaíno", "d": "Mały, chaotyczny bar sąsiedzki na północ od Santa Cruz – piwo i proste tapas, sami miejscowi.", "q": "Bar Casa Vizcaíno, Sevilla"}, {"m": "Na deser drinka", "n": "El Rinconcillo", "d": "Najstarszy bar Sewilli (od 1670 r.). Rachunek kelner pisze kredą na ladzie. Espinacas con garbanzos i bacalao.", "q": "El Rinconcillo, Calle Gerona 40, Sevilla"}],
+  stops:[
+  { id:"lot1", time:"11:10", end:"15:10", name:"Lot do Sewilli", sub:"Ryanair, WAW → SVQ, bezpośredni, ok. 4 h", flight:true,
+    plan:"Wylot z Warszawy 11:10, lądowanie w Sewilli 15:10.",
+    history:["Lotnisko San Pablo to jedno z najstarszych w Hiszpanii – lądowisko działało tu już w latach 20. XX wieku. Obecny terminal zaprojektował Rafael Moneo, laureat Nagrody Pritzkera, na wystawę światową Expo '92."],
+    facts:["W nocy z soboty na niedzielę (25.10) kończy się czas letni – zegarki cofacie o godzinę. Hiszpania i Polska są w tej samej strefie, więc różnicy czasu na miejscu nie ma.","Hiszpania kontynentalna leży geograficznie w strefie czasu Greenwich, a mimo to używa czasu środkowoeuropejskiego (decyzja z 1940 r.). Dlatego słońce wschodzi tu późno, a obiad i kolacja są tak późno."],
+    tips:["Do centrum: autobus EA (Especial Aeropuerto) kursuje co ok. 20–30 min, jazda ok. 35 min. Taksówki mają stałą taryfę do centrum.","Kartą zbliżeniową można płacić w autobusie EA."],
+    maps:"Aeropuerto de Sevilla" },
+  { id:"plaza", time:"Popołudnie", name:"Plaza de España", sub:"Park María Luisa",
+    plan:"Gigantyczny, półkolisty plac. Zwróćcie uwagę na ławki z misternie zdobionymi kaflami (azulejos) – każda reprezentuje inną hiszpańską prowincję. Świetny przykład precyzyjnej pracy z ceramiką.",
+    history:["Plac zbudowano w latach 1914–1928 na Wystawę Iberoamerykańską 1929 r. według projektu sewilskiego architekta Aníbala Gonzáleza. To pokazowe dzieło stylu regionalnego: neomudéjar, renesans i barok w cegle, ceramice i kutym żelazie.","Półkole o średnicy ok. 200 m ma symbolicznie obejmować dawne kolonie w Ameryce – fasada zwrócona jest ku Gwadalkiwirowi, rzece, którą przez wieki wypływały statki do Nowego Świata. Dwie wieże po bokach mają ok. 80 m wysokości.","Wystawę otwarto 9 maja 1929 r. z wielką pompą, ale kilka miesięcy później przyszedł krach na Wall Street. Frekwencja okazała się słabsza od oczekiwań, a miasto latami spłacało długi zaciągnięte na budowy. Po wystawie wiele pawilonów w okolicy zamieniono na muzea, szkoły i konsulaty – część z nich nadal pełni te funkcje.","Park María Luisa, w którym leży plac, to dawne ogrody pałacu San Telmo. W 1893 r. infantka María Luisa Fernanda podarowała je miastu, a francuski projektant Jean-Claude Forestier przekształcił je przed wystawą w romantyczny park z fontannami, pergolami i ławkami z kafli."],
+    facts:["Ławek-alków z azulejos jest 48 i ułożono je alfabetycznie. Na każdej jest mapa prowincji i scena z jej historii – poszukajcie Kordoby i Granady, gdzie będziecie w tym tygodniu.","Kanał o długości ok. 500 m przecinają cztery mostki – symbolizują dawne królestwa Hiszpanii: Kastylię, León, Aragonię i Nawarrę.","Plac zagrał planetę Naboo w filmie Gwiezdne wojny: Atak klonów (2002), a wcześniej Kair w Lawrensie z Arabii (1962).","Budynki do dziś są w użyciu: mieszczą urzędy państwowe i dowództwo wojskowe."],
+    tips:["Na kanale można wypożyczyć łódkę wiosłową na krótką przejażdżkę.","Pod arkadami często grają i tańczą artyści flamenco.","Najładniejsze światło jest przed zachodem słońca – w tym dniu ok. 18:50."],
+    maps:"Plaza de España, Sevilla" },
+  { id:"katedra", time:"Późne popołudnie", name:"Katedra i Giralda", sub:"z zewnątrz",
+    plan:"Największa gotycka katedra świata. Spacer wokół jej murów i spojrzenie na dzwonnicę (Giraldę), która kiedyś była arabskim minaretem.",
+    history:["Katedrę Santa María de la Sede budowano w latach 1401–1506 na miejscu wielkiego meczetu Almohadów. Tradycja przypisuje kapitule słowa: zbudujmy kościół tak wielki, by ci, którzy go zobaczą, uznali nas za szaleńców. Od 1987 r. jest na liście UNESCO razem z Alkazarem i Archiwum Indii.","Giralda to minaret z lat 1184–1198. W 1568 r. Hernán Ruiz dobudował renesansową dzwonnicę zwieńczoną figurą Wiary – Giraldillo. Figura obraca się jak wiatrowskaz (hiszp. girar – obracać), i to od niej wzięła się nazwa całej wieży.","Katedra to przede wszystkim pomnik złotego wieku Sewilli. Bogactwo, które napływało z Ameryki, pozwoliło wypełnić ją dziełami Murilla, Zurbarána i Goi. Ołtarz główny, rzeźbiony i złocony przez ponad 80 lat (1482–1564), uchodzi za jedno z największych retabulów świata – przedstawia ok. tysiąca postaci.","Budowa nie obyła się bez katastrof: w 1511 r. zawaliła się kopuła nad skrzyżowaniem naw, a w 1888 r. ponownie jej część. Giralda ma dwie siostry z tej samej epoki Almohadów – minarety Kutubijja w Marrakeszu i niedokończoną Wieżę Hassana w Rabacie. Gdy patrzycie na dolną część Giraldy, widzicie więc architekturę ówczesnego Maroka."],
+    facts:["W środku Giraldy zamiast schodów jest 35 ramp – po to, by muezin mógł wjechać na górę konno.","W katedrze stoi grobowiec Krzysztofa Kolumba, niesiony przez cztery postacie heroldów symbolizujących królestwa Hiszpanii. Badania DNA wskazują, że przynajmniej część szczątków to rzeczywiście on.","Patio de los Naranjos (dziedziniec pomarańczowy) i brama Puerta del Perdón to zachowane fragmenty dawnego meczetu.","Wieża z figurą mierzy ok. 104 m i przez stulecia była najwyższą budowlą Sewilli."],
+    tips:["Najlepszy widok na Giraldę: Plaza Virgen de los Reyes z fontanną, tuż przy katedrze.","Obok stoi Archiwum Indii – trzymano tu dokumenty z czasów odkrycia i podboju Ameryki."],
+    maps:"Catedral de Sevilla" },
+  { id:"santacruz", time:"Wieczór", name:"Dzielnica Santa Cruz", sub:"dawna judería",
+    plan:"Dawna dzielnica żydowska. Warto zgubić się w labiryncie wąskich uliczek i usiąść w lokalnym barze na pierwsze tapas. Koniecznie spójrzcie na ukryte, wewnętrzne dziedzińce kamienic.",
+    history:["Po zdobyciu Sewilli przez Kastylijczyków w 1248 r. tu mieszkała społeczność żydowska. Pogrom w 1391 r. zakończył historię dzielnicy, a synagogi zamieniono w kościoły – jeden z nich, Santa Cruz, dał nazwę całej okolicy.","Dzisiejszy romantyczny wygląd – placyki z drzewami pomarańczowymi, kafle, kraty w oknach – to w dużej mierze efekt przebudowy z lat 20. XX wieku, przed wystawą 1929 r.","W dzielnicy mieszkał i zmarł w 1682 r. malarz Bartolomé Esteban Murillo. Pochowano go w kościele Santa Cruz, ale w 1810 r. francuskie wojska napoleońskie rozebrały świątynię, a szczątki malarza zaginęły. W miejscu kościoła jest dziś Plaza de Santa Cruz z kutym krzyżem.","Na skraju dzielnicy stoi Hospital de los Venerables z XVII wieku – przytułek dla starych księży, z jednym z najpiękniejszych barokowych wnętrz w mieście. Dziś mieści m.in. galerię obrazów Velázqueza i Murilla."],
+    facts:["Calle Susona: kafelek z czaszką upamiętnia legendę o pięknej Susonie, która w 1481 r. zdradziła spisek swojego ojca. Skruszona, kazała po śmierci wywiesić swoją głowę nad drzwiami domu.","Callejón del Agua biegnie wzdłuż murów Alkazaru – w murze płynął kanał doprowadzający wodę do pałacu.","Calle Reinoso jest tak wąska, że balkony z naprzeciwka niemal się stykają – podobno zakochani mogli się przez nie całować.","Przez otwarte bramy z kutą kratą (cancela) można zajrzeć do patio z fontanną – to tradycyjne chłodzenie domu: cień, woda i rośliny."],
+    tips:["Tapas na start: espinacas con garbanzos (szpinak z ciecierzycą), solomillo al whisky, montadito de pringá, carrillada (policzki wieprzowe).","Las Teresas – klasyczny bar z szynkami pod sufitem, w samym środku dzielnicy.","El Rinconcillo (od 1670 r.) to najstarszy bar Sewilli, ok. 15 min pieszo na północ – rachunek kelner pisze kredą na ladzie.","Sewilczycy jedzą kolację po 21:00 – wcześniej łatwiej o stolik."],
+    maps:"Barrio de Santa Cruz, Sevilla" }
+  ]},
+{ id:"d26", date:"2026-10-26", wd:"Pn", dn:"26", short:"Kordoba", title:"Wycieczka do Kordoby", route:"Sewilla → Kordoba → Sewilla (AVE)", sleep:"Sewilla",
+  intro:{"name": "Kordoba", "sub": "krótka historia miasta", "history": ["Rzymska Corduba była stolicą prowincji Betyka i jednym z najważniejszych miast zachodniej części imperium. Tu urodził się filozof Seneka, nauczyciel Nerona.", "W 750 r. w Damaszku Abbasydzi wymordowali dynastię Umajjadów. Ocalał młody książę Abd ar-Rahman, który przez Afrykę Północną dotarł do Hiszpanii i w 756 r. ustanowił w Kordobie niezależny emirat. W 929 r. jego potomek Abd ar-Rahman III ogłosił się kalifem, rzucając wyzwanie Bagdadowi.", "W X wieku Kordoba była jednym z największych miast świata. Kronikarze opisywali brukowane, oświetlone ulice, setki łaźni i bibliotekę kalifa al-Hakama II, która według tradycji liczyła ok. 400 tysięcy tomów. Pod miastem zbudowano pałacowe miasto Madinat az-Zahra, dziś na liście UNESCO.", "Świetność skończyła się szybko. Od 1009 r. kalifat pogrążył się w wojnie domowej, Madinat az-Zahra została złupiona, a w 1031 r. kalifat rozpadł się na kilkadziesiąt małych królestw (taif). W 1236 r. Kordobę zdobył Ferdynand III i miasto stało się prowincjonalnym ośrodkiem Kastylii."], "facts": ["Kordoba ma najwięcej obiektów z listy UNESCO wśród miast świata: Mezquitę, historyczne centrum, święto patiów i Madinat az-Zahrę."]},
+  food:[{"m": "Śniadanie (Sewilla)", "n": "Bar El Comercio", "d": "Stary bar z 1904 r. przy Calle Lineros – churros z gęstą czekoladą albo tostada z pomidorem i oliwą. Kilka minut od Placu Salwadora.", "q": "Bar El Comercio, Calle Lineros 9, Sevilla"}, {"m": "Obiad (Kordoba)", "n": "Casa Pepe de la Judería", "d": "Działa od 1928 r., tuż za Mezquitą. Na dole tawerna, na górze taras z widokiem na wieżę Mezquity. Salmorejo, rabo de toro, berenjenas z miodem. Droższe, ale klasyka.", "q": "Casa Pepe de la Judería, Calle Romero 1, Córdoba"}, {"m": "Obiad (Kordoba)", "n": "Taberna Salinas", "d": "Tradycyjna tawerna z patio, polecana przez miejscowych jako miejsce na salmorejo, flamenquín i ogon byka. Ok. 10 min od Mezquity – sprawdźcie godziny.", "q": "Taberna Salinas, Calle Tundidores 3, Córdoba"}, {"m": "Obiad (Kordoba)", "n": "Casa Mazal", "d": "Kuchnia sefardyjska i andaluzyjska w domu z XIV wieku w samej judaerii – pasuje do historii dzielnicy.", "q": "Casa Mazal, Córdoba"}, {"m": "Wieczór (Sewilla)", "n": "El Rinconcillo lub Las Teresas", "d": "Po powrocie z Kordoby – tapas o 21:00–22:00 to w Sewilli normalna pora."}],
+  stops:[
+  { id:"alcazar_sev", time:"Rano", name:"Real Alcázar", sub:"Sewilla", ticket:"bilety online",
+    plan:"Królewski pałac zachwycający zdobieniami w stylu mudéjar (arabsko-chrześcijańskim). Ogrody przy pałacu to majstersztyk architektury krajobrazu – od układu alejek, przez geometryczne sadzawki, aż po zastosowanie ceramiki w elementach małej architektury.",
+    history:["Najstarszy wciąż używany pałac królewski w Europie – górne piętra są oficjalną rezydencją hiszpańskiej rodziny królewskiej w Sewilli. Serce kompleksu to pałac króla Piotra I z 1364 r., zbudowany przez muzułmańskich rzemieślników z Granady i Toledo w stylu mudéjar.","Pałac stoi na miejscu arabskiej twierdzy z X wieku, rozbudowywanej przez kolejnych muzułmańskich władców. Piotr I, nazywany przez wrogów Okrutnym, a przez zwolenników Sprawiedliwym, wolał styl mauretański od gotyku i sprowadził do budowy najlepszych rzemieślników z muzułmańskiej Granady.","W 1526 r. w Alkazarze odbył się ślub cesarza Karola V z Izabelą Portugalską. Miesiąc miodowy spędzili potem w Granadzie – i to tam Karol postanowił zbudować swój renesansowy pałac w Alhambrze."],
+    facts:["Ogrody zagrały Wodne Ogrody Dorne w serialu Gra o tron.","Na ścianach pałacu chrześcijańskiego króla są arabskie inskrypcje sławiące… Allaha i sułtana – rzemieślnicy pisali to, co znali."],
+    tips:["Bilety tylko online, najlepiej z kilkutygodniowym wyprzedzeniem.","Najmniej ludzi jest przy pierwszym wejściu rano."],
+    maps:"Real Alcázar de Sevilla" },
+  { id:"uni", time:"11:30", end:"12:30", name:"Uniwersytet w Sewilli", sub:"dawna Królewska Fabryka Tytoniu",
+    plan:"Spacer po dawnej fabryce tytoniu, dziś głównym gmachu uniwersytetu.",
+    history:["Real Fábrica de Tabacos powstała w latach 1728–1770. W chwili budowy była jednym z największych budynków przemysłowych Europy i drugim co do wielkości gmachem w Hiszpanii po klasztorze El Escorial. Tytoń był monopolem państwowym, więc fabryka miała fosę, wieże strażnicze i własne więzienie.","W XIX wieku pracowało tu kilka tysięcy kobiet – cigarreras. Jedną z nich jest Carmen z noweli Prospera Mériméego (1845) i opery Bizeta (1875). Uniwersytet przeniósł się tu w latach 50. XX wieku.","Tytoń z Ameryki trafiał do Europy przez Sewillę i to tu w XVII wieku powstała pierwsza fabryka tytoniu na kontynencie. Nowy, monumentalny gmach z XVIII wieku miał podkreślić, że państwowy monopol tytoniowy to jedno z najważniejszych źródeł dochodów korony.","Cigarreras były jedną z pierwszych dużych grup kobiet pracujących zarobkowo w Hiszpanii. Słynęły z niezależności i ciętego języka, dlatego zachwycały romantycznych podróżników – stąd wziął się mit Carmen. W latach 50. XX wieku produkcję przeniesiono do nowej fabryki po drugiej stronie rzeki, a gmach oddano uniwersytetowi."],
+    facts:["Nad główną bramą stoi figura Sławy z trąbką – symbol potęgi królewskiego monopolu.","Z tutejszego tytoniu kręcono cygara dla całej Europy – Sewilla była tytoniową stolicą świata, bo cały tytoń z Ameryki trafiał najpierw tutaj."],
+    tips:["Wejście jest wolne – zajrzyjcie na dziedzińce i do holu z wielkimi schodami.","Po sąsiedzku stoi Hotel Alfonso XIII (1928) – można zajrzeć do lobby i na patio."],
+    maps:"Universidad de Sevilla, Calle San Fernando 4" },
+  { id:"ave", time:"13:45", end:"14:30", name:"Przejazd AVE", sub:"Sevilla-Santa Justa → Córdoba", ticket:"bilety kupione",
+    plan:"Podróż szybkim pociągiem do Kordoby (bilety kupione z wyprzedzeniem).",
+    history:["Linia dużych prędkości Madryt–Sewilla przez Kordobę ruszyła 21 kwietnia 1992 r., tuż przed Expo '92. Była pierwszą taką linią w Hiszpanii; dziś kraj ma najdłuższą sieć kolei dużych prędkości w Europie. Dworzec Santa Justa też powstał na Expo."],
+    facts:["Pociągi jadą do 300 km/h, a odcinek Sewilla–Kordoba (ok. 130 km) pokonują w ok. 45 min.","Przez lata RENFE dawała gwarancję punktualności – przy dużym opóźnieniu zwracała cenę biletu."],
+    tips:["Przed wejściem na peron jest prześwietlanie bagażu, jak na lotnisku – bądźcie 15–20 min wcześniej.","Z dworca w Kordobie do Mezquity jest ok. 20–25 min pieszo lub kilka minut taksówką."],
+    maps:"Estación Sevilla Santa Justa" },
+  { id:"obiad", time:"15:00", end:"16:00", name:"Obiad w La Judería", sub:"Kordoba",
+    plan:"Przerwa w jednej z bocznych uliczek starego miasta. Pozycja obowiązkowa: chłodnik salmorejo cordobés.",
+    history:["W X wieku Kordoba była stolicą kalifatu (od 929 r.) i jednym z największych miast Europy. Słynęła z bibliotek, łaźni i uczonych, którzy przekładali grecką filozofię.","W judaerii urodził się w 1138 r. Majmonides – lekarz i najważniejszy filozof żydowski średniowiecza. Jego pomnik stoi na Plaza de Tiberiades. Kilka kroków dalej jest synagoga z 1315 r., jedna z trzech zachowanych średniowiecznych synagog w Hiszpanii."],
+    facts:["Salmorejo to pomidory, czerstwy chleb, oliwa i czosnek – gęstszy kuzyn gazpacho, podany z siekanym jajkiem i jamón.","W Kordobie urodzili się też filozof Seneka (ok. 4 r. p.n.e.) i Awerroes (1126), komentator Arystotelesa czytany w całej średniowiecznej Europie.","Inne lokalne dania: flamenquín (rolada z wieprzowiny i szynki w panierce), rabo de toro (duszony ogon byka), berenjenas con miel (smażony bakłażan z miodem trzcinowym)."],
+    tips:["Lokale tuż przy Mezquicie są drogie i turystyczne – dwie, trzy uliczki dalej jest lepiej i taniej.","Kuchnie w Andaluzji zwykle wydają obiad od 13:30 do ok. 16:00 – o 15:00 jesteście w sam raz."],
+    maps:"Judería, Córdoba" },
+  { id:"mezquita", time:"16:00", end:"17:30", name:"Mezquita", sub:"Wielki Meczet-Katedra", ticket:"bilet na godzinę",
+    plan:"Niesamowita przestrzeń z lasem 856 dwukolorowych kolumn. Unikalne połączenie surowej architektury islamu z bogato zdobioną chrześcijańską nawą główną w samym sercu budynku.",
+    history:["Budowę zaczął w 785 r. emir Abd ar-Rahman I na miejscu wizygockiej bazyliki św. Wincentego. Meczet rozbudowywano trzykrotnie: za Abd ar-Rahmana II, al-Hakama II (któremu zawdzięczamy zdobny mihrab) i al-Mansura. Był wtedy jednym z największych meczetów świata.","Po zdobyciu Kordoby przez Ferdynanda III w 1236 r. zamieniono go w katedrę. W 1523 r. w środek wstawiono renesansową nawę. Karolowi V przypisuje się słowa: zbudowaliście to, co można było zbudować wszędzie, a zniszczyliście coś, co było jedyne na świecie. UNESCO od 1984 r.","W 997 r. wódz al-Mansur złupił Santiago de Compostela i kazał chrześcijańskim jeńcom przenieść dzwony katedry aż do Kordoby. Przetopiono je na lampy do meczetu. Gdy w 1236 r. Ferdynand III zdobył miasto, dzwony wróciły do Santiago – tym razem nieśli je muzułmańscy jeńcy.","Przebudowa z 1523 r. wywołała sprzeciw rady miejskiej Kordoby, która pod groźbą kary śmierci zakazała murarzom prac. Kapituła katedralna odwołała się do młodego cesarza Karola V i wygrała. Paradoksalnie to właśnie dlatego, że budynek stał się katedrą, przetrwał w całości – wiele innych meczetów w Hiszpanii po prostu rozebrano."],
+    facts:["Kolumny pochodzą z rozebranych budowli rzymskich i wizygockich – stąd różne kolory marmuru, kapitele i wysokości.","Podwójne łuki (podkowiasty na dole, półkolisty na górze) pozwoliły podnieść strop przy niskich kolumnach. Pasy z czerwonej cegły i białego kamienia to nawiązanie do Wielkiego Meczetu w Damaszku.","Mihrab jest zwrócony na południe, a nie w stronę Mekki – prawdopodobnie Umajjadzi powtórzyli orientację z rodzinnej Syrii.","Złote mozaiki w mihrabie wykonali mistrzowie przysłani przez cesarza bizantyjskiego."],
+    tips:["Dziedziniec Patio de los Naranjos jest bezpłatny – dobry na chwilę cienia przed wejściem.","Dzwonnica wymaga osobnego biletu na konkretną godzinę – warto, jeśli są wolne miejsca.","Po wejściu idźcie najpierw w lewo, do najstarszej części, a potem w głąb, do mihrabu – zobaczycie, jak budowla rosła."],
+    maps:"Mezquita-Catedral de Córdoba" },
+  { id:"alcazar_cor", time:"17:30", end:"18:30", name:"Alcázar w Kordobie i Calleja de las Flores", sub:"ogrody i kwietna uliczka",
+    warn:"Alkazar Królów Chrześcijańskich jest w poniedziałki zamknięty, a jego wnętrza są w remoncie (ogrody wróciły po pracach w czerwcu 2026). Calleja de las Flores jest dostępna bez ograniczeń. Ten czas możecie przeznaczyć na spacer po judaerii, do Puerta de Almodóvar i rzymskich murów, albo dłużej posiedzieć przy moście.",
+    plan:"Kwietna uliczka to źródło inspiracji – białe mury gęsto zawieszone doniczkami. Ogrody Alcázaru to pokaz precyzyjnie formowanej zieleni i tarasowych aranżacji wokół wody.",
+    history:["Alkazar zbudował w 1328 r. król Alfons XI na ruinach rzymskich i arabskich. Królowie Katoliccy mieszkali tu przez kilka lat, szykując zdobycie Granady, i to tu w 1486 r. po raz pierwszy przyjęli Krzysztofa Kolumba.","Przez ponad 300 lat mieściła się tu siedziba Inkwizycji, a potem więzienie – działało jeszcze w połowie XX wieku.","Pod ogrodami zachowały się łaźnie kalifackie z X wieku – pozostałość dawnego pałacu emirów, który stał w tym miejscu przed chrześcijańskim zamkiem. W jednej z sal Alkazaru wystawiono też wielkie rzymskie mozaiki znalezione w XX wieku pod Plaza de la Corredera."],
+    facts:["W ogrodach stoi pomnik Kolumba przed Izabelą i Ferdynandem – upamiętnia tę pierwszą audiencję.","Calleja de las Flores kończy się małym placykiem, z którego w kadrze uliczki widać dzwonnicę Mezquity – to jedno z najczęściej fotografowanych ujęć Kordoby.","Najwięcej kwiatów jest w maju, podczas Fiesta de los Patios (od 2012 r. na liście UNESCO). W październiku doniczki zostają, ale kwitnie mniej."],
+    tips:["Zdjęcie z wejścia w uliczkę, z dzwonnicą na końcu w osi kadru."],
+    maps:"Calleja de las Flores, Córdoba" },
+  { id:"puente_rom", time:"18:30", end:"20:00", name:"Puente Romano", sub:"złota godzina i powrót do Sewilli",
+    plan:"Spacer przez historyczny rzymski most w świetle zachodzącego słońca. Powrót wieczornym pociągiem do Sewilli.",
+    history:["Most powstał w I wieku p.n.e., za czasów Augusta, na trasie Via Augusta. Był wielokrotnie przebudowywany, więc dzisiejszy kształt jest w dużej mierze średniowieczny. Ma ok. 250 m i 16 łuków. Aż do połowy XX wieku był jedynym mostem w mieście.","Na jednym końcu stoi renesansowa Puerta del Puente, na drugim Torre de la Calahorra – wieża obronna z czasów islamskich, dziś muzeum.","Torre de la Calahorra powstała w czasach islamskich jako brama strzegąca mostu, a w 1369 r. przebudował ją Henryk II Trastamara w czasie wojny domowej ze swoim przyrodnim bratem Piotrem I – tym samym, który zbudował pałac w sewilskim Alkazarze. Dziś w wieży jest muzeum poświęcone współżyciu chrześcijan, muzułmanów i Żydów w średniowiecznej Kordobie."],
+    facts:["W połowie mostu stoi figura św. Rafała, patrona Kordoby (1651) – mieszkańcy wciąż zapalają przed nią świeczki.","W 5. sezonie Gry o tron most zagrał Długi Most w Volantis.","Na rzece widać koło wodne Molino de la Albolafia – arabski młyn, który podobno przeszkadzał królowej Izabeli w spaniu, więc kazała go rozebrać."],
+    tips:["Zachód słońca ok. 18:50. Najładniejszy widok na most z Mezquitą jest z drugiego brzegu, spod Calahorry.","Na powrotny pociąg zostawcie zapas: z mostu na dworzec jest ok. 25–30 min pieszo."],
+    maps:"Puente Romano, Córdoba" }
+  ]},
+{ id:"d27", date:"2026-10-27", wd:"Wt", dn:"27", short:"Ronda", title:"Przejazd do Rondy", route:"Sewilla → Ronda", sleep:"Ronda",
+  intro:{"name": "Ronda", "sub": "krótka historia miasta", "history": ["Okolice Rondy zamieszkiwano od prehistorii – w pobliskiej jaskini Cueva de la Pileta są malowidła sprzed ponad 20 tysięcy lat. Rzymianie mieli tu miasto Acinipo, którego ruiny z teatrem stoją ok. 20 km od Rondy.", "Arabska Izn-Rand Onda w XI wieku była stolicą małego niezależnego królestwa, a potem twierdzą na granicy z chrześcijańską Kastylią. Jej położenie na skale czyniło ją jedną z najtrudniejszych do zdobycia warowni al-Andalus.", "Po zdobyciu miasta w 1485 r. Ronda zasłynęła z koni i jeźdźców, a w XVIII wieku z narodzin nowoczesnej corridy. W XIX wieku odkryli ją romantyczni podróżnicy, a w XX wieku Hemingway, Welles i Rilke uczynili z niej mit."], "facts": ["Most Puente Nuevo jest nowy tylko z nazwy – ma ponad 230 lat. Nowy, bo starszy, Puente Viejo, stoi niżej w wąwozie."]},
+  food:[{"m": "Po drodze", "n": "Venta przy drodze", "d": "Na trasie w góry szukajcie przydrożnych vent – proste jedzenie dla kierowców i miejscowych: jajecznica z szynką, gulasz, chleb z oliwą. Tanio i dobrze."}, {"m": "Kolacja", "n": "Tragatá", "d": "Bistro szefa Benita Gómeza (tego od dwugwiazdkowego Bardal) – nowoczesne tapas tuż przy wąwozie. Najlepiej zarezerwować.", "q": "Tragatá, Calle Nueva 4, Ronda"}, {"m": "Kolacja", "n": "Casa María", "d": "Bez stałego menu – szefowa gotuje to, co rano było na targu. Małe, rodzinne, w starówce. Rezerwacja wskazana.", "q": "Restaurante Casa María, Ronda"}, {"m": "Kolacja", "n": "Mesón El Sacristán", "d": "Jedyny piec opalany drewnem w Rondzie – mięsa z dymem, rozpadające się w ustach.", "q": "Mesón El Sacristán, Ronda"}, {"m": "Uwaga", "n": "Bardal (2 gwiazdki Michelin)", "d": "We wtorek nieczynne – kolacje od środy do niedzieli. Jeśli chcieliście tam iść, to nie tym razem."}],
+  stops:[
+  { id:"auto", time:"12:00", end:"13:00", name:"Odbiór auta", sub:"mały kompakt z pełnym ubezpieczeniem", ticket:"opłacone",
+    plan:"Wypożyczacie opłacony wcześniej, mały samochód kompaktowy z pełnym ubezpieczeniem (bez blokady kaucji na karcie).",
+    history:[],
+    facts:["Limity prędkości: autostrady 120 km/h, drogi poza miastem 90 km/h, w miastach zwykle 50, a na wielu ulicach 30 km/h.","Autostrady oznaczone A są bezpłatne, a AP mogą być płatne. Winiet w Hiszpanii nie ma.","Wyprzedzając rowerzystę trzeba zostawić 1,5 m odstępu – wolno przy tym przekroczyć linię ciągłą."],
+    tips:["Weźcie prawo jazdy i dowód lub paszport. Kartę kredytową na nazwisko kierowcy wypożyczalnie czasem sprawdzają nawet bez kaucji.","Zróbcie zdjęcia lub krótki film auta dookoła przy odbiorze.","Do centrów Sewilli i Granady nie wjeżdżajcie – działają tam strefy ograniczonego ruchu z kamerami."],
+    maps:"" },
+  { id:"roadtrip", time:"13:00", end:"15:30", name:"Roadtrip w góry", sub:"przez Andaluzję do Rondy",
+    plan:"Malownicza jazda do Rondy. Auto parkujecie na dużym, podziemnym parkingu tuż przed historycznym centrum.",
+    history:["Droga prowadzi w stronę gór Serranía de Ronda i szlaku pueblos blancos – białych miasteczek na granicy prowincji Kadyks i Malaga. Wiele z nich było przez wieki twierdzami na pograniczu chrześcijańsko-muzułmańskim, stąd człon de la Frontera w nazwach."],
+    facts:["Domy bieli się wapnem: odbija słońce i chłodzi, a dawniej działało też jako środek odkażający, zwłaszcza w czasach epidemii.","Setenil de las Bodegas to miasteczko, w którym domy zbudowano pod skalnym nawisem – skała jest ich dachem."],
+    tips:["Jeśli macie zapas czasu: Setenil leży ok. 20 km na północ od Rondy – krótki objazd na kawę pod skałą.","Zatankujcie przed górami – na serpentynach stacji jest mniej."],
+    maps:"Ronda, Málaga" },
+  { id:"tajo", time:"Popołudnie", name:"Wąwóz El Tajo i Puente Nuevo", sub:"Ronda",
+    plan:"Zapierający dech, potężny most łączący nową i starą część miasta zawieszonego na skale. Warto zejść ścieżką w dół wąwozu, aby zrobić najlepsze zdjęcia mostu od dołu.",
+    history:["Rzeka Guadalevín wyżłobiła wąwóz głęboki na ok. 100–120 m, dzieląc Rondę na arabską starówkę (La Ciudad) i nowsze El Mercadillo. Chrześcijanie zdobyli miasto w 1485 r., siedem lat przed upadkiem Granady.","Pierwszy most w tym miejscu zawalił się w 1741 r., kilka lat po budowie, zabijając ok. 50 osób. Obecny Puente Nuevo stawiano w latach 1751–1793 według projektu José Martína de Aldehueli. Ma ok. 98 m wysokości.","Arabska Ronda była niemal nie do zdobycia, a jej słabym punktem była woda. W skale wykuto La Mina – ok. 200 stopni schodzących wewnątrz urwiska do rzeki, którymi niewolnicy wynosili wodę do miasta. W 1485 r. wojska Ferdynanda Aragońskiego ostrzelały mury z armat i przejęły dostęp do wody – Ronda poddała się po kilkunastu dniach. Schody można zwiedzać w ogrodach Casa del Rey Moro.","W XIX wieku Serranía de Ronda słynęła z bandoleros – zbójników i przemytników ukrywających się w górach. Dla romantycznych podróżników z Anglii i Francji byli symbolem dzikiej, niezależnej Hiszpanii, a ich legendy przyciągały pierwszych turystów. W mieście jest nawet Muzeum Bandolero."],
+    facts:["Nad środkowym łukiem jest komora, która przez lata służyła jako więzienie.","Ernest Hemingway osadził w Rondzie inspirację dla słynnej sceny zrzucania ludzi z urwiska w Komu bije dzwon.","Orson Welles kochał Rondę tak bardzo, że jego prochy spoczęły na farmie jego przyjaciela, torreadora Antonia Ordóñeza, pod miastem.","Rainer Maria Rilke spędził tu zimę 1912/13 – w ogrodzie Hotelu Reina Victoria stoi jego pomnik."],
+    tips:["Ścieżka w dół zaczyna się przy Plaza de María Auxiliadora. Zejście do punktu widokowego pod mostem to ok. 15–20 min, powrót pod górę – w dobrych butach.","Jardines de Cuenca to tarasowe ogrody na skraju wąwozu z widokiem na most z boku.","Zachód słońca ok. 18:55 – most podświetlają wieczorem, warto wrócić po zmroku."],
+    maps:"Puente Nuevo, Ronda" }
+  ]},
+{ id:"d28", date:"2026-10-28", wd:"Śr", dn:"28", short:"Nerja", title:"Przejazd do Nerji", route:"Ronda → Nerja", sleep:"Nerja",
+  intro:{"name": "Nerja i Costa del Sol", "sub": "krótka historia", "history": ["Wybrzeże między Malagą a Almerią handlowało ze światem od czasów Fenicjan, którzy założyli Malakę (dzisiejszą Malagę) ok. VIII wieku p.n.e. Pod Arabami nadmorskie miasteczka żyły z jedwabiu, rodzynek i cukru, a sieć wież strażniczych ostrzegała przed piratami z Afryki Północnej.", "Przez wieki to był ubogi rejon rybaków i rolników. Wszystko zmieniło się w latach 50. i 60. XX wieku, gdy reżim Franco postawił na turystykę. Costa del Sol stała się jednym z pierwszych celów masowych wakacji w Europie – Nerja zachowała jednak skalę małego miasteczka."], "facts": ["Malaga to miasto rodzinne Pabla Picassa – urodził się tam w 1881 r."]},
+  food:[{"m": "Śniadanie (Ronda)", "n": "La Casa del Jamón", "d": "Pan con tomate z drobno krojonym jamón i bułki z szynką w różnych rocznikach.", "q": "La Casa del Jamón, Ronda"}, {"m": "Śniadanie (Ronda)", "n": "Cafetería La Esquina", "d": "Zwykła hiszpańska kawiarnia: tortilla, churros, café con leche – za grosze."}, {"m": "Obiad (Nerja)", "n": "Ayo, plaża Burriana", "d": "Kultowy chiringuito – paella gotowana na ogniu z drewna w ogromnych patelniach. Działa od lat 60./70. i można zamówić pojedynczą porcję.", "q": "Ayo, Paseo Burriana 15, Nerja"}, {"m": "Obiad (Nerja)", "n": "Merendero La Barca", "d": "Też na Burrianie, od 1967 r. – ryby i ryż z widokiem na morze.", "q": "Merendero La Barca, Playa Burriana, Nerja"}, {"m": "Kolacja", "n": "Bar Redondo", "d": "Darmowe tapas do napoju, okrągła lada, lokalny tłum.", "q": "Bar Redondo, Nerja"}, {"m": "Kolacja", "n": "Bar El Pulguilla", "d": "Owoce morza i krewetki pil-pil (w oliwie z czosnkiem i chili).", "q": "Bar El Pulguilla, Nerja"}],
+  stops:[
+  { id:"toros", time:"Rano", name:"Plaza de Toros", sub:"Ronda", ticket:"na miejscu ok. 7 €",
+    plan:"Jedna z najstarszych i najbardziej eleganckich aren walk byków w Hiszpanii. Zachwyca klasyczną, kamienną strukturą i proporcjami. Bilety na miejscu (można też online).",
+    history:["Arenę otwarto w 1785 r. Zbudowało ją Real Maestranza de Caballería de Ronda – bractwo rycerskie założone w 1572 r., najstarsze w Hiszpanii, które wciąż jest jej właścicielem.","W Rondzie narodziła się nowoczesna corrida piesza. Pedro Romero (1754–1839) ujednolicił jej zasady; według tradycji zabił ok. 5600 byków i nigdy nie został poważnie ranny.","Maestranza powstała, by szkolić szlachtę w jeździe konnej i walce – walka z bykiem z konia była ćwiczeniem bojowym arystokracji. Gdy w XVIII wieku nowa dynastia Burbonów okazała tej rozrywce niechęć, szlachta ją porzuciła, a pałeczkę przejęli ludzie z gminu walczący pieszo. W Rondzie zrobiła to rodzina Romero: dziadek Francisco wprowadził czerwoną płachtę (muleta), a wnuk Pedro stworzył styl nazywany szkołą rondeńską – spokojny, oszczędny w ruchach."],
+    facts:["Arena ma średnicę 66 m – to jedna z najszerszych na świecie.","Co roku we wrześniu odbywa się tu Corrida Goyesca: toreadorzy występują w strojach z obrazów Goi.","W środku jest muzeum ze strojami toreadorów i kolekcją dawnej broni Maestranzy."],
+    tips:["Cena biletu mogła się zmienić – sprawdźcie przy kasie lub online.","Arena jest 2 min od Puente Nuevo – dobry moment na ostatnie zdjęcia mostu w porannym świetle."],
+    maps:"Plaza de Toros de Ronda" },
+  { id:"trasa_nerja", time:"Przed\u00ADpołudnie", name:"Trasa widokowa do Nerji", sub:"ok. 2 h jazdy",
+    plan:"Przejazd z Rondy przez górskie serpentyny, ominięcie centrum Malagi autostradą i dojazd wzdłuż wybrzeża do Nerji.",
+    history:["Za Malagą zaczyna się Axarquía – wschodnia część prowincji, przez stulecia zamknięta w górach rolnicza kraina rodzynek i wina. Dziś to jedno z głównych w Europie zagłębi uprawy awokado i mango."],
+    facts:["Costa del Sol nazywa się tak nie bez powodu: słońce świeci tu przez ok. 320 dni w roku.","Bielone wioski na zboczach nad wybrzeżem były kiedyś ostrzegane przed piratami przez łańcuch wież strażniczych – część z nich wciąż stoi przy drodze."],
+    tips:["Obwodnica Malagi (A-7 / AP-7) jest dobrze oznaczona – jedźcie w kierunku Almería / Motril.","Jeśli zgłodniejecie, po drodze jest Torre del Mar ze świeżymi rybami (espetos – sardynki z rożna)."],
+    maps:"Nerja, Málaga" },
+  { id:"balcon", time:"Popołudnie", name:"Balcón de Europa i plaża", sub:"Nerja",
+    plan:"Słynny punkt widokowy wysunięty w morze, zbudowany na dawnych fundamentach twierdzy. Miejsce na kawę, leniwy spacer promenadą, plażowanie i odpoczynek od zwiedzania miast.",
+    history:["Taras zbudowano na miejscu dawnej baszty obronnej – zachowały się tu stare armaty. Nazwę miał nadać król Alfons XII, który przyjechał do Nerji w 1885 r. po niszczycielskim trzęsieniu ziemi i zachwycony widokiem nazwał to miejsce Balkonem Europy. Jego pomnik stoi przy balustradzie.","Nerja to rzymska Detunda i arabska Narixa – od słowa oznaczającego obfite źródło. Przez wieki żyła z jedwabiu, a potem z trzciny cukrowej. W pobliskim Maro stoją ruiny cukrowni, a nad drogą widać czterokondygnacyjny Acueducto del Águila z lat 80. XIX wieku, który doprowadzał do niej wodę.","Twierdza, na której fundamentach stoi taras, została wysadzona w czasie wojen napoleońskich, by nie wpadła w ręce Francuzów. Trzęsienie ziemi z Bożego Narodzenia 1884 r. zabiło w prowincjach Granady i Malagi ok. 1200 osób – stąd królewska wizyta, po której taras dostał swoją nazwę. Turyści zaczęli tu przyjeżdżać masowo dopiero w latach 60. XX wieku."],
+    facts:["Kilka kilometrów dalej jest Cueva de Nerja – jaskinię odkryło w 1959 r. pięciu chłopców szukających nietoperzy. W środku jest jedna z największych kolumn naciekowych na świecie (ok. 32 m).","W Nerji kręcono kultowy hiszpański serial Verano azul (1981). W parku jego imienia stoi łódź jednego z bohaterów.","Frigiliana, 7 km w głąb lądu, uchodzi za jedno z najpiękniejszych białych miasteczek Andaluzji."],
+    tips:["Plaże: Calahonda tuż pod Balcónem, Burriana z barami i paellą, dzika Playa de Maro z kajakami pod wodospad.","Woda pod koniec października ma zwykle ok. 19–21°C – da się pływać.","Zachód słońca nad morzem ok. 18:50."],
+    maps:"Balcón de Europa, Nerja" }
+  ]},
+{ id:"d29", date:"2026-10-29", wd:"Czw", dn:"29", short:"Granada", title:"Przejazd do Granady", route:"Nerja → Granada", sleep:"Granada",
+  intro:{"name": "Granada", "sub": "krótka historia miasta", "history": ["Na wzgórzu Albaicín istniała iberyjska osada Iliberis, a Rzymianie nazywali miasto Florentia Iliberritana. Arabowie nazwali żydowską część osady Garnata al-Jahud, i od tego wywodzi się dzisiejsza nazwa.", "W 1013 r. berberyjska dynastia Zirydów uczyniła Granadę stolicą swojego królestwa. W 1238 r. Muhammad I założył dynastię Nasrydów – emirat Granady przetrwał jako ostatnie państwo muzułmańskie na Półwyspie aż do 1492 r.", "Kapitulacja 2 stycznia 1492 r. zakończyła ponad 780 lat obecności islamu w Hiszpanii. Królowie Katoliccy byli z miastem tak związani, że kazali się tu pochować – ich grobowce są w Kaplicy Królewskiej przy katedrze."], "facts": ["Granat (granada) jest symbolem miasta – zobaczycie go w herbie, na studzienkach i słupkach przy chodnikach."]},
+  food:[{"m": "Śniadanie (Nerja)", "n": "Mena Garden", "d": "Kawiarnia z ogrodem – tosty z różnymi dodatkami, croissanty, jajka.", "q": "Mena Garden, Nerja"}, {"m": "W Alhambrze", "n": "Weźcie przekąski", "d": "W kompleksie jest niewiele miejsc do jedzenia i są drogie – kanapki, owoce i woda w plecaku to dobry pomysł na 3–4 godziny zwiedzania."}, {"m": "Kolacja / tapas", "n": "Bodegas Castañeda", "d": "Najbardziej tradycyjny bar tapas w Granadzie: beczki, szynki, wermut z beczki. Do każdego napoju tapa za darmo.", "q": "Bodegas Castañeda, Calle Almireceros 1, Granada"}, {"m": "Kolacja / tapas", "n": "Los Diamantes", "d": "Od 1942 r., specjaliści od smażonych ryb i owoców morza z wybrzeża. Lokal przy Plaza Nueva, u stóp Albaicín.", "q": "Los Diamantes Plaza Nueva, Granada"}, {"m": "Kolacja w Albaicín", "n": "Bar Aixa", "d": "Głośny, lubiany bar zajmujący pół Plaza Larga, otwarty dłużej niż inne.", "q": "Bar Aixa, Plaza Larga, Granada"}, {"m": "Kolacja z widokiem", "n": "Mirador de Morayma lub Las Tomasas", "d": "Restauracje w Albaicín z widokiem na podświetloną Alhambrę – drożej, ale za ten widok warto. Zarezerwujcie stolik na tarasie.", "q": "Mirador de Morayma, Granada"}],
+  stops:[
+  { id:"dojazd_gr", time:"Rano", name:"Dojazd do Granady", sub:"ok. 1–1,5 h, opcjonalnie plaża po drodze",
+    plan:"Trasa z Nerji u podnóża Sierra Nevady. Zostawienie auta w hotelowym garażu lub na wyznaczonym parkingu. Na slajdzie było też plażowanie – rano po drodze można złapać jeszcze godzinę nad morzem.",
+    history:["Droga A-44 z wybrzeża do Granady przecina przełęcz Suspiro del Moro – Westchnienie Maura. Według legendy tu ostatni władca Granady, Boabdil, obejrzał się w 1492 r. na utracone miasto i zapłakał, a jego matka miała powiedzieć: płacz jak kobieta nad tym, czego nie umiałeś obronić jak mężczyzna."],
+    facts:["Sierra Nevada ma najwyższy szczyt Półwyspu Iberyjskiego – Mulhacén (3479 m), nazwany podobno na cześć przedostatniego emira Granady.","Z Granady w godzinę dojedzie się na stok, a w godzinę na plażę – miejscowi lubią się tym chwalić."],
+    tips:["Plaże po drodze: Playa de Maro albo Cantarriján, tuż za granicą prowincji – rano jeszcze bez tłumów.","W Granadzie nie wjeżdżajcie do centrum ani do Albaicín – strefy z kamerami, mandaty przychodzą do wypożyczalni."],
+    maps:"Granada" },
+  { id:"alhambra", time:"W ciągu dnia", name:"Kompleks Alhambra", sub:"Pałace Nasrydów, Generalife, Alcazaba", ticket:"bilety z godziną",
+    plan:"Pałac letni i ogrody Generalife (aranżacja zieleni ze spływającą wodą). Najważniejsze są Pałace Nasrydów (wejście o rygorystycznie wyznaczonej porze) – koronkowe stiuki, drewniane stropy i dbałość o najdrobniejszy detal.",
+    history:["Nazwa pochodzi od arabskiego al-Hamra – czerwona, od koloru murów. Twierdzę rozbudował od 1238 r. Muhammad I, założyciel dynastii Nasrydów, a najwspanialsze pałace powstały w XIV wieku za Jusufa I i Muhammada V. Emirat Granady przetrwał jako ostatnie muzułmańskie państwo na Półwyspie aż do 2 stycznia 1492 r., gdy Boabdil oddał klucze miasta Królom Katolickim.","Po upadku Granady w obrębie murów Karol V wzniósł renesansowy pałac z okrągłym dziedzińcem. Zaniedbaną Alhambrę na nowo odkrył dla świata Washington Irving, który mieszkał tu i wydał w 1832 r. Opowieści z Alhambry. UNESCO od 1984 r.","Nasrydzi przetrwali 250 lat dzięki zręcznej dyplomacji: przez większość tego czasu byli lennikami Kastylii i płacili jej trybut w złocie. Ich państwo było schronieniem dla muzułmanów uciekających z ziem zdobytych przez chrześcijan, dlatego Granada była bardzo gęsto zaludniona.","Rok 1492 zmienił tu wszystko. 2 stycznia Boabdil oddał miasto, 31 marca w Alhambrze Królowie Katoliccy podpisali dekret o wypędzeniu Żydów z Hiszpanii, a w kwietniu w pobliskim Santa Fe podpisali umowę z Kolumbem, która otworzyła drogę do Ameryki.","W 1812 r. wycofujące się wojska napoleońskie wysadziły część wież. Według tradycji resztę uratował inwalida, który zdążył przeciąć lonty. Ratowanie Alhambry na serio zaczęło się dopiero w XIX i XX wieku – największe zasługi miał architekt Leopoldo Torres Balbás, który od 1923 r. odnawiał ją z naukową starannością."],
+    facts:["Fontannę na Dziedzińcu Lwów podtrzymuje 12 marmurowych lwów, a hydraulika Nasrydów działała bez pomp – tylko grawitacją, wodą sprowadzoną z gór.","Sklepienie Sali Dwóch Sióstr tworzą tysiące wiszących komórek (muqarnas) – często podaje się liczbę ok. 5000.","Ściany pokrywają wersety i poezja – Alhambrę nazywa się czasem książką, którą da się przeczytać.","Według legendy w Sali Abencerrajów zgładzono rodzinę rycerzy, a rdzawe plamy w fontannie to ich krew.","Generalife to od arabskiego Dżannat al-Arif – ogród architekta (lub: najszlachetniejszy z ogrodów)."],
+    tips:["Weźcie dowód lub paszport – nazwisko na bilecie jest sprawdzane.","Do Pałaców Nasrydów wchodzi się tylko o godzinie z biletu. Spóźnienie oznacza utratę wejścia; w środku nie ma limitu czasu, ale nie da się wrócić.","Na całość zaplanujcie 3–4 h, wygodne buty i wodę.","Kolejność zależy od godziny wejścia do Pałaców – resztę (Alcazaba, Generalife) układacie wokół niej."],
+    maps:"Alhambra, Granada" },
+  { id:"albaicin", time:"Wieczór", name:"Dzielnica Albaicín", sub:"Mirador de San Nicolás",
+    plan:"Spacer stromymi, białymi uliczkami dawnej dzielnicy arabskiej. Cel to Mirador de San Nicolás – plac z klasycznym, pocztówkowym widokiem na podświetloną Alhambrę na tle gór.",
+    history:["Najstarsza dzielnica Granady – osada istniała tu przed Arabami, a w XI wieku dynastia Zirydów zbudowała na wzgórzu pierwszą twierdzę. Po 1492 r. zamieszkiwali ją moryskowie, potomkowie muzułmanów. UNESCO od 1994 r.","Charakterystyczne są carmenes – domy z ogrodem i sadem ukrytym za wysokim murem.","Warunki kapitulacji z 1492 r. gwarantowały muzułmanom swobodę wyznania, ale już w 1499 r. kardynał Cisneros zaczął masowe przymusowe chrzty i palenie arabskich ksiąg. Albaicín wybuchł buntem, który stłumiono. Moryskowie, czyli ochrzczeni muzułmanie, wzniecili potem wielkie powstanie w Alpujarras (1568–1571), a w latach 1609–1614 wypędzono ich z Hiszpanii. Dzielnica podupadła na całe stulecia.","Granada to też miasto Federico Garcíi Lorki, który urodził się w pobliskim Fuente Vaqueros w 1898 r. Na początku wojny domowej, w sierpniu 1936 r., został zamordowany przez frankistów na wzgórzach pod Granadą. Jego letni dom, Huerta de San Vicente, jest dziś muzeum."],
+    facts:["Bill Clinton miał nazwać zachód słońca z Mirador de San Nicolás najpiękniejszym na świecie.","W Granadzie do każdego zamówionego napoju bar podaje tapę za darmo – i z każdą kolejną kolejką tapa bywa lepsza.","Obok jest Sacromonte, dzielnica domów-jaskiń wykutych w zboczu, z tradycją flamenco zambra."],
+    tips:["Zachód słońca ok. 18:45 – bądźcie na miejscu pół godziny wcześniej, plac szybko się zapełnia.","Pod górę jeżdżą minibusy C31 i C32, jeśli nogi odmówią posłuszeństwa po Alhambrze.","Calle Calderería Nueva to uliczka herbaciarni (teterías) i marokańskich sklepików.","Przy mirador uważajcie na kieszonkowców."],
+    maps:"Mirador de San Nicolás, Granada" }
+  ]},
+{ id:"d30", date:"2026-10-30", wd:"Pt", dn:"30", short:"Powrót", title:"Powrót do domu", route:"Granada → Sewilla → Warszawa", sleep:"",
+  food:[{"m": "Śniadanie", "n": "Zabierzcie coś z wieczora", "d": "O 6:00 w Granadzie prawie nic nie jest otwarte. Kupcie w czwartek bułki i owoce, a kawę wypijcie na stacji przy A-92 albo już na lotnisku."}],
+  stops:[
+  { id:"a92", time:"Wcześnie rano", name:"Trasa A-92", sub:"Granada → lotnisko San Pablo, ok. 2,5 h",
+    
+    plan:"Przejazd z Granady na lotnisko San Pablo w Sewilli (ok. 2,5 godziny jazdy bez wjeżdżania do miast).",
+    history:["A-92, Autovía de Andalucía, łączy wschód i zachód regionu. Mija Antequerę – miasto z dolmenami sprzed ok. 5–6 tys. lat, od 2016 r. na liście UNESCO."],
+    facts:["Przy Antequerze z autostrady widać Peña de los Enamorados – Skałę Zakochanych. Jej profil przypomina leżącą twarz, a legenda mówi o parze kochanków z wrogich rodów, którzy rzucili się z niej trzymając się za ręce."],
+    tips:["Przy locie o 11:00 wyjazd z Granady najpóźniej ok. 6:00 – 2,5 h jazdy, zwrot auta i ok. 2 h na lotnisku. Spakujcie się wieczorem.","Zatankujcie do pełna przed lotniskiem, jeśli macie umowę pełny–pełny – stacje przy lotnisku bywają droższe."],
+    maps:"Aeropuerto de Sevilla" },
+  { id:"zwrot", time:"Na lotnisku", name:"Zwrot auta", sub:"Super CDW – oddajecie kluczyki",
+    plan:"Z pełnym ubezpieczeniem polega to wyłącznie na zdaniu kluczyków pracownikowi wypożyczalni na lotniskowym parkingu i przejściu do terminala.",
+    history:[], facts:[],
+    tips:["Zróbcie zdjęcia auta i licznika paliwa przy zwrocie – na wszelki wypadek.","Zachowajcie ostatni paragon z tankowania."],
+    maps:"Aeropuerto de Sevilla rent a car" },
+  { id:"lot2", time:"11:00", end:"14:55", name:"Lot do Warszawy", sub:"Wizz Air, SVQ → WAW, bezpośredni, 3 h 55 min", flight:true,
+    plan:"Wylot 11:00, przylot do Warszawy ok. 14:55.",
+    history:[], facts:[],
+    tips:["Odprawa online w aplikacji Wizz Air – i sprawdźcie wymiary bagażu podręcznego, bywają egzekwowane przy bramce."],
+    maps:"" }
+  ]}
+];
+
+const TICKETS = [
+  { g:"Loty", items:[
+    {id:"t_ry", t:"Ryanair WAW → SVQ", d:"Nd 25.10, 11:10 – odprawa online, karty pokładowe w telefonie"},
+    {id:"t_wz", t:"Wizz Air SVQ → WAW", d:"Pt 30.10, 11:00 – odprawa online"} ]},
+  { g:"Transport", items:[
+    {id:"t_ave1", t:"AVE Sewilla → Kordoba", d:"Pn 26.10, 13:45"},
+    {id:"t_ave2", t:"Pociąg Kordoba → Sewilla", d:"Pn 26.10, wieczór"},
+    {id:"t_car", t:"Wypożyczenie auta", d:"Wt 27.10 – zwrot Pt 30.10 na lotnisku SVQ. Prawo jazdy i dowód"} ]},
+  { g:"Wejścia", items:[
+    {id:"t_mez", t:"Mezquita", d:"Pn 26.10, 16:00 – bilet na godzinę"},
+    {id:"t_alh", t:"Alhambra", d:"Czw 29.10 – godzina wejścia do Pałaców Nasrydów, dowód"},
+    {id:"t_tor", t:"Plaza de Toros, Ronda", d:"Śr 28.10 – na miejscu lub online"} ]},
+  { g:"Noclegi", items:[
+    {id:"t_n1", t:"Sewilla", d:"25–27.10, 2 noce"},
+    {id:"t_n2", t:"Ronda", d:"27–28.10"},
+    {id:"t_n3", t:"Nerja", d:"28–29.10"},
+    {id:"t_n4", t:"Granada", d:"29–30.10 – parking hotelowy?"} ]}
+];
+
+/* =================== STAN =================== */
+const LS = "andaluzja26:";
+const store = {
+  get(k, d){ try{ const v = localStorage.getItem(LS+k); return v==null ? d : JSON.parse(v);}catch(e){ return d; } },
+  set(k, v){ try{ localStorage.setItem(LS+k, JSON.stringify(v)); }catch(e){} }
+};
+let done = store.get("done", {});
+let checked = store.get("tickets", {});
+let scrolls = store.get("scrolls", {});
+
+function todayISO(){ const n=new Date(); return n.getFullYear()+"-"+String(n.getMonth()+1).padStart(2,"0")+"-"+String(n.getDate()).padStart(2,"0"); }
+function initialView(){
+  const t = todayISO();
+  const hit = DAYS.find(d=>d.date===t);
+  if(hit) return hit.id;
+  const last = store.get("view", null);
+  if(last && DAYS.some(d=>d.id===last)) return last;
+  return DAYS[0].id;
+}
+let view = initialView();
+
+/* =================== RENDER =================== */
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+function statusText(){
+  const t = new Date(todayISO()+"T00:00:00");
+  const start = new Date("2026-10-25T00:00:00"), end = new Date("2026-10-30T00:00:00");
+  const day = 864e5;
+  if(t < start){ const n = Math.round((start-t)/day); return n===1 ? "Wylot jutro o 11:10" : "Do wylotu: "+n+" dni"; }
+  if(t > end) return "Hasta la próxima";
+  const i = Math.round((t-start)/day)+1;
+  return "Dzień "+i+" z 6";
+}
+
+function renderDays(){
+  const t = todayISO();
+  let h = DAYS.map(d=>`<button class="day-chip${d.date===t?" today":""}" role="tab" aria-selected="${view===d.id}" data-view="${d.id}">
+      <div class="wd">${d.wd}</div><div class="dn">${d.dn}</div><div class="ct">${esc(d.short)}</div></button>`).join("");
+  $("#days").innerHTML = h;
+  const sel = $("#days [aria-selected=true]");
+  if(sel) sel.scrollIntoView({inline:"center", block:"nearest"});
+}
+
+function badgeHTML(s){
+  let b = "";
+  if(s.skip) b += `<span class="badge skip">Pomijamy</span>`;
+  if(s.flight) b += `<span class="badge flight">Lot</span>`;
+  if(s.ticket) b += `<span class="badge ticket">${esc(s.ticket)}</span>`;
+  if(s.warn) b += `<span class="badge warn">Uwaga</span>`;
+  return b ? `<div class="badges">${b}</div>` : "";
+}
+
+function timeHTML(s){
+  if(/^\d/.test(s.time)) return `<b>${s.time}</b>${s.end? s.end : ""}`;
+  return s.time;
+}
+
+function renderDay(d){
+  const stops = d.stops.map(s=>{
+    const isDone = !!done[s.id];
+    return `<li class="stop${isDone?" is-done":""}${s.skip?" is-skip":""}" data-id="${s.id}">
+      <div class="when">${timeHTML(s)}</div>
+      <div style="position:relative">
+        <button class="card" data-open="${s.id}">
+          <div class="t">${/^\d/.test(s.time) ? s.time+(s.end?"–"+s.end:"") : esc(s.time)}</div>
+          <h3>${esc(s.name)}</h3>
+          <p>${esc(s.sub || s.plan)}</p>
+          ${badgeHTML(s)}
+        </button>
+        ${s.skip?"":`<button class="check" data-check="${s.id}" aria-label="${isDone?"Odznacz":"Oznacz jako zaliczone"}: ${esc(s.name)}" aria-pressed="${isDone}">
+          <svg width="16" height="16" viewBox="0 0 16 16"><path d="M3 8.5l3.2 3L13 4.5" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>`}
+      </div></li>`;
+  }).join("");
+  return `<div class="fade-in">
+    <div class="day-head"><h2>${esc(d.title)}</h2></div>
+    ${d.intro?`<button class="intro-card" data-open="intro_${d.id}"><span class="intro-tile tiles"></span><span><b>${esc(d.intro.name)}: krótka historia</b><span>${esc(d.intro.history[0].slice(0,90))}…</span></span></button>`:""}
+    ${d.food?`<button class="intro-card food-card" data-open="food_${d.id}"><span class="food-ico">🍽️</span><span><b>Gdzie zjeść</b><span>${esc(d.food.map(f=>f.n).slice(0,3).join(", "))}</span></span></button>`:""}
+    <ol class="timeline">${stops}</ol>
+    ${d.sleep?`<div class="sleep"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>Nocleg: ${esc(d.sleep)}</div>`:""}
+  </div>`;
+}
+
+function renderTickets(){
+  const groups = TICKETS.map(g=>`<h2 class="group-h">${esc(g.g)}</h2><ul class="tlist">${
+    g.items.map(i=>`<li class="titem${checked[i.id]?" checked":""}"><input type="checkbox" id="${i.id}" data-ticket="${i.id}" ${checked[i.id]?"checked":""}>
+      <label for="${i.id}"><div class="tt">${esc(i.t)}</div><div class="td">${esc(i.d)}</div></label></li>`).join("")
+  }</ul>`).join("");
+  return `<div class="fade-in"><div class="day-head"><h2>Bilety i rezerwacje</h2><p>Odhaczcie, co macie w telefonie lub w mailu.</p></div>${groups}
+    <div class="footer"><button id="resetAll">Wyczyść wszystkie odhaczenia w aplikacji</button></div></div>`;
+}
+
+function render(){
+  renderDays();
+  const d = DAYS.find(x=>x.id===view);
+  $("#main").innerHTML = d ? renderDay(d) : renderTickets();
+  const y = scrolls[view];
+  requestAnimationFrame(()=>window.scrollTo(0, y||0));
+}
+
+/* =================== ARKUSZ =================== */
+function findStop(id){ for(const d of DAYS){ if(d.intro && id==="intro_"+d.id) return {d, s:Object.assign({isIntro:true, time:""}, d.intro)}; if(d.food && id==="food_"+d.id) return {d, s:{isIntro:true, isFood:true, time:"", name:"Gdzie zjeść", sub:d.short, food:d.food}}; const s=d.stops.find(x=>x.id===id); if(s) return {d,s}; } return null; }
+function mapsURL(q){ return "https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(q); }
+function navURL(q){ return "https://www.google.com/maps/dir/?api=1&destination="+encodeURIComponent(q); }
+
+function sheetHTML(s){
+  let h = "";
+  if(s.isFood){ return `<ul class="food">${s.food.map(f=>`<li><div class="fm">${esc(f.m)}</div><div class="fn">${esc(f.n)}</div><div class="fd">${esc(f.d)}</div>${f.q?`<a class="fl" href="${mapsURL(f.q)}" target="_blank" rel="noopener">Pokaż na mapie →</a>`:""}</li>`).join("")}</ul><p class="fnote">Godziny otwarcia mogą się zmieniać – przed wyjściem zerknijcie na mapę.</p>`; }
+  if(s.warn) h += `<div class="note warn">${esc(s.warn)}</div>`;
+  if(s.plan) h += `<div class="note plan"><b>Z waszego planu</b>${esc(s.plan)}</div>`;
+  if(!s.isIntro) h += `<div class="actions">`;
+  if(s.maps){ h += `<a class="btn primary" href="${navURL(s.maps)}" target="_blank" rel="noopener">Nawiguj</a><a class="btn" href="${mapsURL(s.maps)}" target="_blank" rel="noopener">Pokaż na mapie</a>`; }
+  if(!s.skip && !s.isIntro) h += `<button class="btn${done[s.id]?" done-on":""}" data-check="${s.id}">${done[s.id]?"Zaliczone ✓":"Oznacz jako zaliczone"}</button>`;
+  if(!s.isIntro) h += `</div>`;
+  if(s.history && s.history.length) h += `<section><h4>Historia</h4>${s.history.map(p=>`<p>${esc(p)}</p>`).join("")}</section>`;
+  if(s.facts && s.facts.length) h += `<section><h4>Ciekawostki</h4><ul>${s.facts.map(f=>`<li>${esc(f)}</li>`).join("")}</ul></section>`;
+  if(s.tips && s.tips.length) h += `<section><h4>Praktycznie</h4><ul>${s.tips.map(f=>`<li>${esc(f)}</li>`).join("")}</ul></section>`;
+  return h;
+}
+
+let openId = null;
+function openSheet(id, push=true){
+  const f = findStop(id); if(!f) return;
+  openId = id;
+  const s = f.s;
+  $("#sheetTitle").textContent = s.name;
+  $("#sheetSub").textContent = [ /^\d/.test(s.time) ? s.time+(s.end?"–"+s.end:"") : s.time, s.sub ].filter(Boolean).join(", ");
+  $("#sheetBody").innerHTML = sheetHTML(s);
+  $("#sheetBody").scrollTop = 0;
+  $("#sheet").classList.add("open"); $("#scrim").classList.add("open");
+  $("#sheet").setAttribute("aria-hidden","false");
+  if(push) try{ history.pushState({sheet:id}, ""); }catch(e){}
+  setTimeout(()=>$("#sheetClose").focus({preventScroll:true}), 50);
+}
+function closeSheet(fromPop=false){
+  if(!openId) return;
+  const id = openId; openId = null;
+  $("#sheet").classList.remove("open"); $("#scrim").classList.remove("open");
+  $("#sheet").setAttribute("aria-hidden","true");
+  if(!fromPop) try{ if(history.state && history.state.sheet) history.back(); }catch(e){}
+  const el = document.querySelector(`[data-open="${id}"]`); if(el) el.focus({preventScroll:true});
+}
+window.addEventListener("popstate", ()=>{ if(openId) closeSheet(true); });
+
+/* =================== ZDARZENIA =================== */
+function toggleDone(id){
+  done[id] = !done[id]; if(!done[id]) delete done[id];
+  store.set("done", done);
+  const li = document.querySelector(`.stop[data-id="${id}"]`);
+  if(li){ li.classList.toggle("is-done", !!done[id]); const c=li.querySelector(".check"); if(c){ c.setAttribute("aria-pressed", !!done[id]); } }
+  if(openId===id){ const b=$("#sheetBody [data-check]"); if(b){ b.classList.toggle("done-on", !!done[id]); b.textContent = done[id]?"Zaliczone ✓":"Oznacz jako zaliczone"; } }
+}
+
+document.addEventListener("click", e=>{
+  const v = e.target.closest("[data-view]");
+  if(v){ scrolls[view] = window.scrollY; store.set("scrolls", scrolls); view = v.dataset.view; store.set("view", view); scrolls[view]=0; render(); return; }
+  const c = e.target.closest("[data-check]");
+  if(c){ e.stopPropagation(); toggleDone(c.dataset.check); return; }
+  const o = e.target.closest("[data-open]");
+  if(o){ openSheet(o.dataset.open); return; }
+  if(e.target.id==="resetAll"){ if(confirm("Wyczyścić odhaczone miejsca i bilety?")){ done={}; checked={}; store.set("done",done); store.set("tickets",checked); render(); } }
+});
+document.addEventListener("change", e=>{
+  const t = e.target.closest("[data-ticket]");
+  if(t){ checked[t.dataset.ticket] = t.checked; if(!t.checked) delete checked[t.dataset.ticket]; store.set("tickets", checked); t.closest(".titem").classList.toggle("checked", t.checked); }
+});
+$("#scrim").addEventListener("click", ()=>closeSheet());
+$("#sheetClose").addEventListener("click", ()=>closeSheet());
+document.addEventListener("keydown", e=>{ if(e.key==="Escape") closeSheet(); });
+
+/* przesunięcie w dół zamyka arkusz */
+(function(){
+  let y0=null, dy=0; const sh=$("#sheet"), body=$("#sheetBody");
+  sh.addEventListener("touchstart", e=>{ if(body.scrollTop>0 && body.contains(e.target)) { y0=null; return; } y0=e.touches[0].clientY; dy=0; }, {passive:true});
+  sh.addEventListener("touchmove", e=>{ if(y0==null) return; dy=e.touches[0].clientY-y0; if(dy>0){ sh.style.transition="none"; sh.style.transform=`translateY(${dy}px)`; } }, {passive:true});
+  sh.addEventListener("touchend", ()=>{ if(y0==null) return; sh.style.transition=""; sh.style.transform=""; if(dy>90) closeSheet(); y0=null; });
+})();
+
+let st; window.addEventListener("scroll", ()=>{ clearTimeout(st); st=setTimeout(()=>{ scrolls[view]=window.scrollY; store.set("scrolls", scrolls); }, 200); }, {passive:true});
+
+render();
+</script>
+<script>
+if("serviceWorker" in navigator){ window.addEventListener("load", ()=>{ navigator.serviceWorker.register("sw.js").catch(()=>{}); }); }
+</script>
+</body>
+</html>
